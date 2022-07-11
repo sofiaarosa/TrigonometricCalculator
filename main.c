@@ -15,6 +15,7 @@
 
 //conio.c function headers
 void gotoxy (int, int);
+void cursor(int);
 int SetColor(char);
 
 //function headers 
@@ -22,35 +23,35 @@ int mainMenu();
 int measureMenu();
 int menuSelection(int, int);
 int reprocessing();
-double getAngle(int);
+double getValue();
 double convertMeasure(int, double);
-double calculate(int, double);
+double calculate(double);
 void printHeader();
-void printCalculus(int, double, double);
-void cursor(int);
+void printCalculus(double, double);
+
 
 //global variables
-int measure;
+int measure, operation;
 
 int main() {
-	setlocale(LC_ALL, "Portuguese"); 
+	setlocale(LC_CTYPE, "Portuguese"); 
 	cursor(0);
     
-	int operation, out = 0;
-    double angle, result;
+	int out = 0;
+    double value, result;
 
 	do{
+		value = 0; result = 0;
 		operation = mainMenu();
 	    measure = measureMenu();
 	
-		if (operation < 7) angle = getAngle(1);
-		else getAngle(0);
+		value = getValue();
 	
-	    printCalculus(operation, angle, calculate(operation, angle));
+	    printCalculus(value, calculate(value));
 	    getch();
 	    
 		out = reprocessing();	
-	}while(!out); 
+	}while(out != 2); 
 
     return 0;
 }
@@ -63,26 +64,31 @@ void printHeader(){
 int mainMenu() {
     printHeader();
 
-    gotoxy(3,3); printf("Seno");
-    gotoxy(3,4); printf("Cosseno");
-    gotoxy(3,5); printf("Tangente");
-    gotoxy(3,6); printf("Cossecante");
-    gotoxy(3,7); printf("Secante");
-    gotoxy(3,8); printf("Cotangente");
-    gotoxy(3,9); printf("Arcoseno");
-    gotoxy(3,10); printf("Arcocosseno");
-    gotoxy(3,11); printf("Arcotangente");
+	gotoxy(3,3); printf("Selecione a operação a ser realizada: ");
+    gotoxy(3,4); printf("Seno");
+    gotoxy(3,5); printf("Cosseno");
+    gotoxy(3,6); printf("Tangente");
+    gotoxy(3,7); printf("Cossecante");
+    gotoxy(3,8); printf("Secante");
+    gotoxy(3,9); printf("Cotangente");
+    gotoxy(3,10); printf("Arcoseno");
+    gotoxy(3,11); printf("Arcocosseno");
+    gotoxy(3,12); printf("Arcotangente");
 
-    return menuSelection(3,11);
+    return menuSelection(4,12);
 }
 
 int measureMenu(){
     printHeader();
 
-    gotoxy(3,3);printf("Radianos");
-    gotoxy(3,4);printf("Graus");
+	gotoxy(3,3);
+	if(operation<7)printf("Ângulo de entrada medido em: ");
+	else printf("Resultado em: ");
+	
+    gotoxy(3,4);printf("Radianos");
+    gotoxy(3,5);printf("Graus");
 
-    return menuSelection(3,4);
+    return menuSelection(4,5);
 }
 
 int menuSelection(int rowMin, int rowMax){
@@ -114,26 +120,35 @@ int menuSelection(int rowMin, int rowMax){
     return choice;
 }
 
-double convertMeasure(int operation, double angle){
-    angle = operation ? angle * M_PI / 180 : angle * 180 / M_PI;
+double convertMeasure(int direction, double angle){
+	
+	if(direction == 1) angle *= M_PI / 180;
+	else angle *= 180 / M_PI;
     
     return angle;
 }
 
-double getAngle(int op){
-    double angle;
+double getValue(){
+    double v;
 
     printHeader();
     gotoxy(0,3); printf("Insira o valor: ");
-    scanf("%lf", &angle);
-    if(!op) {
-    	return angle;	
+    scanf(" %lf", &v);
+    
+    //if operation is asin, acos, atg => doesn't convert at all
+    if(operation >= 7){
+    	return v;
 	}
-	if(measure != 1) angle = convertMeasure(1, angle);
-    return angle;
+    
+    //if angle given in degrees convert to radians
+	if(measure != 1) {
+		v = convertMeasure(1, v);	
+	}
+	
+    return v;
 }
 
-double calculate(int operation, double angle) {
+double calculate(double angle) {
     switch (operation) {
         case 1:
             /* seno */
@@ -166,44 +181,51 @@ double calculate(int operation, double angle) {
     }
 }
 
-void printCalculus(int operation, double angle, double result) {
-	if(measure != 1 && operation < 7) angle = convertMeasure(0, angle);
+void printCalculus(double value, double result) {
+	//if degrees selected in first place, convert from rad back to degrees
+	//but only if operation isn't any of arc functions
+	if(measure != 1) {
+		if(operation < 7)
+			value = convertMeasure(0, value);
+		else 
+			result = convertMeasure(0,result);
+	}
     switch (operation) {
         case 1:
             /* seno */
-            gotoxy(0,3); printf("Seno de %.2lf: %.3lf\n", angle, result);
+            gotoxy(0,3); printf("Seno de %.2lf: %.3lf\n", value, result);
             break;
         case 2:
             /* cosseno */
-            gotoxy(0,3); printf("Cosseno de %.2lf: %.3lf\n", angle, result);
+            gotoxy(0,3); printf("Cosseno de %.2lf: %.3lf\n", value, result);
             break;
         case 3:
             /* tangente */
-            gotoxy(0,3); printf("Tangente de %.2lf: %.3lf\n", angle, result);
+            gotoxy(0,3); printf("Tangente de %.2lf: %.3lf\n", value, result);
             break;
         case 4:
             /* cossecante */
-            gotoxy(0,3); printf("Cossecante de %.2lf: %.3lf\n", angle, result);
+            gotoxy(0,3); printf("Cossecante de %.2lf: %.3lf\n", value, result);
             break;
         case 5:
             /* secante */
-            gotoxy(0,3); printf("Secante de %.2lf: %.3lf\n", angle, result);
+            gotoxy(0,3); printf("Secante de %.2lf: %.3lf\n", value, result);
             break;
         case 6:
             /* cotangente */
-            gotoxy(0,3); printf("Cotangente de %.2lf: %.3lf\n", angle, result);
+            gotoxy(0,3); printf("Cotangente de %.2lf: %.3lf\n", value, result);
             break;
         case 7:
             /* arco seno */
-            gotoxy(0,3); printf("arco seno de %.2lf: %.3lf\n", angle, result);
+            gotoxy(0,3); printf("arco seno de %.2lf: %.3lf\n", value, result);
             break;
         case 8:
             /* arco cosseno */
-            gotoxy(0,3); printf("arco cosseno de %.2lf: %.3lf\n", angle, result);
+            gotoxy(0,3); printf("arco cosseno de %.2lf: %.3lf\n", value, result);
             break;
         case 9:
             /* arco tangente */
-            gotoxy(0,3); printf("Arco tangente de %.2lf: %.3lf\n", angle, result);
+            gotoxy(0,3); printf("Arco tangente de %.2lf: %.3lf\n", value, result);
             break;
     }
     
