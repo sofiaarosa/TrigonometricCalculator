@@ -33,7 +33,7 @@ void printCalculus(double, double);
 int measure, operation;
 
 int main() {
-	system("mode con:cols=90 lines=40");
+	system("mode con:cols=90 lines=20");
 	SetConsoleTitle("Calculadora Trigonometrica");
 	setlocale(LC_CTYPE, "Portuguese"); 
 	cursor(0);
@@ -76,17 +76,17 @@ int mainMenu() {
     printHeader();
 
 	gotoxy(3,3); printf("Selecione a operação a ser realizada: ");
-    gotoxy(3,4); printf("Seno");
-    gotoxy(3,5); printf("Cosseno");
-    gotoxy(3,6); printf("Tangente");
-    gotoxy(3,7); printf("Cossecante");
-    gotoxy(3,8); printf("Secante");
-    gotoxy(3,9); printf("Cotangente");
-    gotoxy(3,10); printf("Arcoseno");
-    gotoxy(3,11); printf("Arcocosseno");
-    gotoxy(3,12); printf("Arcotangente");
+    gotoxy(3,5); printf("Seno");
+    gotoxy(3,6); printf("Cosseno");
+    gotoxy(3,7); printf("Tangente");
+    gotoxy(3,8); printf("Cossecante");
+    gotoxy(3,9); printf("Secante");
+    gotoxy(3,10); printf("Cotangente");
+    gotoxy(3,11); printf("Arcoseno");
+    gotoxy(3,12); printf("Arcocosseno");
+    gotoxy(3,13); printf("Arcotangente");
 
-    return menuSelection(4,12);
+    return menuSelection(5,13);
 }
 
 int measureMenu(){
@@ -96,8 +96,8 @@ int measureMenu(){
 	if(operation<7)printf("Ângulo de entrada medido em: ");
 	else printf("Resultado em: ");
 	
-    gotoxy(3,4);printf("Radianos");
-    gotoxy(3,5);printf("Graus");
+    gotoxy(3,5);printf("Radianos");
+    gotoxy(3,6);printf("Graus");
 
     return menuSelection(4,5);
 }
@@ -132,7 +132,7 @@ int menuSelection(int rowMin, int rowMax){
 }
 
 double convertMeasure(int direction, double angle){
-	
+	float M_PI = 3.141596;
 	if(direction == 1) angle *= M_PI / 180;
 	else angle *= 180 / M_PI;
     
@@ -246,7 +246,7 @@ void printCalculus(double value, double result) {
 int reprocessing(){
 	printHeader();
 	gotoxy(3,3);printf("Deseja calcular novamente?");
-	gotoxy(3,4);printf("Sim");
-    gotoxy(3,5);printf("Não");
-    return menuSelection(4,5);
+	gotoxy(3,5);printf("Sim");
+    gotoxy(3,6);printf("Não");
+    return menuSelection(5,6);
 }
