@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <windows.h>
-#include <string.h>
 #include <conio.h>
+#include "conio_functions.h" /*substitution of conio.c*/
 #include <stdlib.h>
 #include <locale.h>
 
@@ -12,11 +12,10 @@
 #define enter 13
 #define f1 59
 
-
-//conio.c function headers
-void gotoxy (int, int);
-void cursor(int);
-int SetColor(char);
+#define screenColumns 90
+#define horizontalCenter 45
+#define screenRows 40
+#define verticalCenter 20
 
 //function headers 
 int mainMenu();
@@ -34,6 +33,8 @@ void printCalculus(double, double);
 int measure, operation;
 
 int main() {
+	system("mode con:cols=90 lines=40");
+	SetConsoleTitle("Calculadora Trigonometrica");
 	setlocale(LC_CTYPE, "Portuguese"); 
 	cursor(0);
     
@@ -57,8 +58,18 @@ int main() {
 }
 
 void printHeader(){
+	textbackground(15);
+	textcolor(0);
+	
     system("cls");
-    gotoxy(15,1); printf("CALCULADORA TRIGONOMETRICA");
+    int i;
+    for(i=0;i<screenColumns;i++){
+	    gotoxy(i,1);
+    	textbackground(14);printf(" ");
+    }
+    
+    gotoxy(horizontalCenter - 13,1); printf("CALCULADORA TRIGONOMÉTRICA");
+    textbackground(15);
 }
 
 int mainMenu() {
@@ -238,32 +249,4 @@ int reprocessing(){
 	gotoxy(3,4);printf("Sim");
     gotoxy(3,5);printf("Não");
     return menuSelection(4,5);
-}
-
-//conio.c functions
-//-------------------------------------------------------------------------
-void gotoxy (int x, int y) {
-  COORD pos = {x, y};
-  SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
-}
-//-------------------------------------------------------------------------
-int SetColor (char color) {
-  HANDLE h;
-  h = GetStdHandle (STD_OUTPUT_HANDLE);
-  return SetConsoleTextAttribute (h,color);
-}
-//-------------------------------------------------------------------------
-void cursor (int x) {
-	switch (x) {
-		case 0: {
-			CONSOLE_CURSOR_INFO cursor = {1, FALSE};
-			SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor);
-			break;
-		}
-		case 1: {
-			CONSOLE_CURSOR_INFO cursor = {1, TRUE};
-			SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor);
-			break;
-		}
-	}
 }
