@@ -18,6 +18,7 @@
 #define verticalCenter 20
 
 //function headers 
+int startMenu();
 int mainMenu();
 int measureMenu();
 int menuSelection(int, int);
@@ -31,6 +32,7 @@ void printCalculus(double, double);
 
 //global variables
 int measure, operation;
+int exitProgram = 0;
 
 int main() {
 	system("mode con:cols=90 lines=20");
@@ -38,21 +40,29 @@ int main() {
 	setlocale(LC_CTYPE, "Portuguese"); 
 	cursor(0);
     
-	int out = 0;
+	int out = 0, action = 0;
     double value, result;
 
 	do{
+	    while(action != 1){
+	        action = startMenu();
+    	    if(action == 2) infoSystem();
+    	    else if(action == 3) return 0;
+        }
+	    
 		value = 0; result = 0;
 		operation = mainMenu();
+		if(exitProgram > 0) break;
 	    measure = measureMenu();
-	
+	    if(exitProgram > 0) break;
 		value = getValue();
 	
 	    printCalculus(value, calculate(value));
 	    getch();
 	    
-		out = reprocessing();	
-	}while(out != 2); 
+		out = reprocessing();
+        if(exitProgram > 0) break;	
+	}while(out != 2 && exitProgram == 0); 
 
     return 0;
 }
@@ -70,6 +80,28 @@ void printHeader(){
     
     gotoxy(horizontalCenter - 13,1); printf("CALCULADORA TRIGONOMÉTRICA");
     textbackground(15);
+}
+
+int startMenu(){
+    printHeader();
+
+	gotoxy(3,3); printf("Opções do programa: ");
+    gotoxy(3,5); printf("Iniciar calculadora");
+    gotoxy(3,6); printf("Info do sistema");
+    gotoxy(3,7); printf("Sair");
+
+    return menuSelection(5,7);
+}
+
+int infoSystem(){
+    printHeader();
+    gotoxy(3, 3);
+    printf("Trabalho 1 de algoritmos - 2022");
+    gotoxy(3,4); printf("Alunos desenvolvedores: ");
+    gotoxy(3, 5); printf("221025588 - Sofia Azevedo Rosa");
+    gotoxy(3, 6); printf("221026321 - Vinicius Casimiro da Silveira");
+    gotoxy(10,10); printf("Pressione qualquer tecla para prosseguir.");
+    getch();
 }
 
 int mainMenu() {
@@ -93,13 +125,13 @@ int measureMenu(){
     printHeader();
 
 	gotoxy(3,3);
-	if(operation<7)printf("Ângulo de entrada medido em: ");
+	if(operation<7) printf("Ângulo de entrada medido em: ");
 	else printf("Resultado em: ");
 	
     gotoxy(3,5);printf("Radianos");
     gotoxy(3,6);printf("Graus");
 
-    return menuSelection(4,5);
+    return menuSelection(5,6);
 }
 
 int menuSelection(int rowMin, int rowMax){
@@ -123,8 +155,13 @@ int menuSelection(int rowMin, int rowMax){
                     break;
             case enter:
             	choice = aux-rowMin+1;
+            	break;
+           	case esc:
+           	    exitProgram = 1;
+           	    gotoxy(0, 15);
+           	    return;
+       	        
 		}
-        
         gotoxy(0,aux); printf(" >");
     }
     
@@ -132,7 +169,7 @@ int menuSelection(int rowMin, int rowMax){
 }
 
 double convertMeasure(int direction, double angle){
-	float M_PI = 3.141596;
+	//float M_PI = 3.141596;
 	if(direction == 1) angle *= M_PI / 180;
 	else angle *= 180 / M_PI;
     
@@ -195,48 +232,67 @@ double calculate(double angle) {
 void printCalculus(double value, double result) {
 	//if degrees selected in first place, convert from rad back to degrees
 	//but only if operation isn't any of arc functions
-	if(measure != 1) {
+    double rawValue = value;
+
+
+    if(measure != 1) {
 		if(operation < 7)
 			value = convertMeasure(0, value);
+			
 		else 
 			result = convertMeasure(0,result);
 	}
+	
+    
+    gotoxy(0,3); 
     switch (operation) {
         case 1:
             /* seno */
-            gotoxy(0,3); printf("Seno de %.2lf: %.3lf\n", value, result);
+            printf("Seno de %.2lf: %.3lf\n", value, result);
             break;
         case 2:
             /* cosseno */
-            gotoxy(0,3); printf("Cosseno de %.2lf: %.3lf\n", value, result);
+            printf("Cosseno de %.2lf: %.3lf\n", value, result);
             break;
         case 3:
-            /* tangente */
-            gotoxy(0,3); printf("Tangente de %.2lf: %.3lf\n", value, result);
+            /* tangente */            
+            if(cos(rawValue) > pow(10, -25) && cos(rawValue) < pow(10, 25)){
+                printf("Tangente de %.2lf não existe.\n", value);
+            }
+            else printf("Tangente de %.2lf: %.3lf\n", value, result);
             break;
         case 4:
             /* cossecante */
-            gotoxy(0,3); printf("Cossecante de %.2lf: %.3lf\n", value, result);
+            if(sin(rawValue) == 0){
+                printf("Cossecante de %.2lf não existe.\n", value);
+            }
+            else printf("Cossecante de %.2lf: %.3lf\n", value, result);
             break;
         case 5:
             /* secante */
-            gotoxy(0,3); printf("Secante de %.2lf: %.3lf\n", value, result);
+            if(cos(rawValue) > pow(10, -25) && cos(rawValue) < pow(10, 25)){
+                printf("Secante de %.2lf não existe.\n", value);
+            }
+            else printf("Secante de %.2lf: %.3lf\n", value, result);
             break;
         case 6:
             /* cotangente */
-            gotoxy(0,3); printf("Cotangente de %.2lf: %.3lf\n", value, result);
+            if(sin(rawValue) == 0){
+                printf("Cotangente de %.2lf não existe.\n", value);
+            }
+            else printf("Cotangente de %.2lf: %.3lf\n", value, result);
             break;
         case 7:
             /* arco seno */
-            gotoxy(0,3); printf("arco seno de %.2lf: %.3lf\n", value, result);
+            printf("arco seno de %.2lf: %.3lf\n", value, result);
             break;
         case 8:
             /* arco cosseno */
-            gotoxy(0,3); printf("arco cosseno de %.2lf: %.3lf\n", value, result);
+            printf("arco cosseno de %.2lf: %.3lf\n", value, result);
             break;
         case 9:
             /* arco tangente */
-            gotoxy(0,3); printf("Arco tangente de %.2lf: %.3lf\n", value, result);
+            printf("Arco tangente de %.2lf: %.3lf\n", value, result);
             break;
     }
     
@@ -248,5 +304,6 @@ int reprocessing(){
 	gotoxy(3,3);printf("Deseja calcular novamente?");
 	gotoxy(3,5);printf("Sim");
     gotoxy(3,6);printf("Não");
+    
     return menuSelection(5,6);
 }
